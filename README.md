@@ -34,12 +34,17 @@ Dự án **Corporate LMS** hướng tới số hóa toàn bộ quy trình đào 
 
 ## 3. Cấu Trúc Phân Nhánh (Git Flow)
 
-Hệ thống áp dụng mô hình phân nhánh **Git Flow**:
+Hệ thống áp dụng Git Flow tinh gọn. Trên GitHub, **`main` là default branch** và giữ phiên bản production/demo; **`develop`** là nhánh tích hợp của nhóm. Không push trực tiếp vào hai nhánh này.
 
-- **`develop`** *(nhánh tích hợp mặc định)*: Nhánh tích hợp chính của nhóm. Các tính năng sau khi review được gộp vào đây.
-- **`main`**: Nhánh sản phẩm chính thức (production/demo). Chỉ gộp code từ `develop` khi kết thúc đợt phát triển hoặc chuẩn bị demo nghiệm thu.
-- **`feature/<ten-tinh-nang>`**: Nhánh cá nhân tạo từ `develop` để làm từng task, ví dụ `feature/login-ui` hoặc `feature/quiz-schema`.
-- **`bugfix/<ten-loi>`**: Nhánh sửa lỗi tạo từ `develop` khi phát hiện bug tích hợp.
+| Loại nhánh | Tạo từ | Mục đích | Nhánh đích của PR |
+| --- | --- | --- | --- |
+| **`feature/<ten-tinh-nang>`** | `develop` | Phát triển tính năng, ví dụ `feature/login-ui`. | `develop` |
+| **`bugfix/<ten-loi>`** | `develop` | Sửa lỗi phát hiện trong quá trình phát triển/tích hợp. | `develop` |
+| **`docs/<pham-vi>`** | `develop` | Cập nhật README hoặc tài liệu, ví dụ `docs/update-readme`. | `develop` |
+| **`release/<version>`** | `develop` | Ổn định và kiểm thử phiên bản trước demo/phát hành; chỉ tạo khi cần. | `main` |
+| **`hotfix/<ten-loi>`** | `main` | Sửa lỗi khẩn cấp ảnh hưởng production/demo. | `main`, sau đó đồng bộ bản sửa về `develop` |
+
+Sau khi release được gộp vào `main`, mọi sửa đổi phát sinh trong quá trình ổn định release phải được đưa lại vào `develop` qua PR. Nhánh feature, bugfix, docs, release và hotfix nên được xóa sau khi PR liên quan đã hoàn tất.
 
 ---
 
@@ -57,13 +62,15 @@ Cả hai nhánh **`main`** và **`develop`** được bảo vệ trên GitHub:
 
 ## 5. Quy Trình Làm Việc Hàng Ngày
 
-### Bước 1: Cập nhật `develop` và tạo nhánh tính năng
+### Bước 1: Cập nhật `develop` và tạo nhánh công việc
 
 ```bash
 git switch develop
 git pull origin develop
 git switch -c feature/chuc-nang-cua-ban
 ```
+
+Thay `feature/chuc-nang-cua-ban` bằng loại nhánh phù hợp, như `bugfix/loi-dang-nhap` hoặc `docs/update-readme`. Nhánh `release/<version>` cũng được tạo từ `develop`; riêng `hotfix/<ten-loi>` phải được tạo từ `main`.
 
 ### Bước 2: Lập trình và commit code
 
@@ -90,15 +97,15 @@ git push -u origin feature/chuc-nang-cua-ban
 ### Bước 4: Tạo Pull Request
 
 1. Truy cập repository trên GitHub và chọn **Compare & pull request**.
-2. Chọn **base: `develop`** và **compare: `feature/chuc-nang-cua-ban`**.
-3. Mô tả ngắn gọn các thay đổi trong PR.
-4. Chọn assignee và reviewer phù hợp.
+2. Chọn nhánh đích theo quy tắc ở mục 3: feature/bugfix/docs vào `develop`; release/hotfix vào `main`.
+3. Mô tả ngắn gọn các thay đổi trong PR và chọn reviewer phù hợp.
 
 ### Bước 5: Kiểm tra và merge
 
 - Đảm bảo GitHub Actions CI pass và PR có ít nhất một approval.
-- Chọn **Squash and merge** để gộp code vào `develop`.
-- Xóa nhánh `feature` trên GitHub sau khi merge thành công.
+- Chọn **Squash and merge** vào đúng nhánh đích.
+- Với hotfix, sau khi PR vào `main` được merge, tạo PR đưa cùng bản sửa về `develop`.
+- Xóa nhánh công việc trên GitHub sau khi các PR liên quan đã merge.
 
 ---
 
@@ -109,5 +116,3 @@ GitHub Actions workflow tại `.github/workflows/ci.yml` chạy khi có push ho�
 - **Môi trường:** Ubuntu latest, Node.js 20.
 - **Frontend:** Nếu thư mục `frontend` tồn tại, cài dependencies bằng `npm install` và chạy `npm run lint --if-present`.
 - **Backend:** Nếu thư mục `backend` tồn tại, cài dependencies bằng `npm install` và chạy `npm run build --if-present`.
-
-Workflow hiện tại chưa chạy lệnh build cho Frontend. Các bước kiểm tra cũng được bỏ qua nếu thư mục tương ứng chưa có trong repository.
