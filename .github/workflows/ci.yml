@@ -1,0 +1,39 @@
+name: Corporate LMS CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  ci-check:
+    name: Build & Lint Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Kiểm tra Frontend
+      - name: Install & Check Frontend
+        run: |
+          if [ -d "frontend" ]; then
+            cd frontend
+            npm install
+            npm run lint --if-present
+          fi
+
+      # Kiểm tra Backend
+      - name: Install & Check Backend
+        run: |
+          if [ -d "backend" ]; then
+            cd backend
+            npm install
+            npm run build --if-present
+          fi
