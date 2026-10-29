@@ -1,0 +1,38 @@
+[
+  {
+    "module": "Học phần 1: Java Core & Spring Boot",
+    "quizTitle": "Quiz Đánh Giá Học Phần 1: Java Core",
+    "questions": [
+      {
+        "questionText": "Sự khác biệt giữa HashMap và ConcurrentHashMap trong Java là gì?",
+        "questionType": "MCQ",
+        "options": [
+          { "key": "A", "text": "HashMap thread-safe hơn ConcurrentHashMap" },
+          { "key": "B", "text": "ConcurrentHashMap hỗ trợ truy cập đồng thời thread-safe bằng lock striping" },
+          { "key": "C", "text": "Cả hai đều không thread-safe" },
+          { "key": "D", "text": "HashMap chỉ dùng cho kiểu dữ liệu Primitive" }
+        ],
+        "correctAnswer": "B",
+        "relatedLessonTopic": "Multi-threading & Concurrency"
+      }
+    ]
+  },
+  {
+    "module": "Học phần 2: PostgreSQL & RESTful API",
+    "quizTitle": "Quiz Đánh Giá Học Phần 2: Database & API",
+    "questions": [
+      {
+        "questionText": "Trong PostgreSQL, Index nên được sử dụng khi nào để tối ưu hóa truy vấn?",
+        "questionType": "MCQ",
+        "options": [
+          { "key": "A", "text": "Khi bảng có dữ liệu rất nhỏ, dưới 100 dòng" },
+          { "key": "B", "text": "Đánh index cho tất cả các cột trong bảng để tăng tốc độ ghi dữ liệu" },
+          { "key": "C", "text": "Khi cột đó thường xuyên được sử dụng trong mệnh đề WHERE hoặc JOIN ở các bảng lớn" },
+          { "key": "D", "text": "Khi cột lưu trữ dữ liệu dạng Boolean có tỷ lệ True/False là 50/50" }
+        ],
+        "correctAnswer": "C",
+        "relatedLessonTopic": "Tối ưu hóa truy vấn PostgreSQL với Index"
+      }
+    ]
+  }
+]
