@@ -27,6 +27,7 @@ jobs:
             cd frontend
             npm install
             npm run lint --if-present
+            npm run build --if-present
           fi
 
       # Kiểm tra Backend
