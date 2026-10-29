@@ -116,3 +116,41 @@ GitHub Actions workflow tại `.github/workflows/ci.yml` chạy khi có push ho�
 - **Môi trường:** Ubuntu latest, Node.js 20.
 - **Frontend:** Nếu thư mục `frontend` tồn tại, cài dependencies bằng `npm install` và chạy `npm run lint --if-present`.
 - **Backend:** Nếu thư mục `backend` tồn tại, cài dependencies bằng `npm install` và chạy `npm run build --if-present`.
+
+---
+
+
+## 7. Hướng Dẫn Cài Đặt & Chạy Docker Local (PostgreSQL & Redis)
+
+Hệ thống sử dụng **Docker Compose** để chạy cơ sở dữ liệu **PostgreSQL 16** và **Redis 7** trên máy cá nhân.
+
+### Bước 1: Bật Docker Desktop
+Mở phần mềm **Docker Desktop** trên máy tính và đợi biểu tượng góc dưới màn hình báo đang chạy (*Engine running*).
+
+### Bước 2: Khởi chạy Database và Redis
+Mở Terminal tại thư mục gốc của dự án và chạy lệnh:
+
+```bash
+docker compose up -d
+```
+
+### Bước 3: Kiểm tra trạng thái
+Chạy lệnh sau để kiểm tra:
+
+```bash
+docker compose ps
+```
+Nếu thấy 2 dòng `lms_postgres` và `lms_redis` hiện chữ **`Up (healthy)`** là đã chạy thành công.
+
+### Bước 4: Thông tin kết nối Database (Dành cho Backend Prisma ORM)
+Copy dòng dưới đây vào file `backend/.env` khi làm việc với Backend:
+
+```env
+DATABASE_URL="postgresql://lms_user:lms_password@localhost:5432/corporate_lms?schema=public"
+REDIS_URL="redis://localhost:6379"
+```
+
+### Lệnh tắt Docker khi nghỉ làm việc
+```bash
+docker compose stop
+```
