@@ -1,37 +1,61 @@
-// Bảng 1: Thông tin bài kiểm tra
+// 1. Thông tin bài kiểm tra (Quiz)
 model Quiz {
   id                 String         @id @default(uuid())
-  moduleId           String         // Khóa ngoại liên kết với Học phần (Module)
+  courseId           String?        // Khóa ngoại liên kết với Khóa học
+  moduleId           String?        // Khóa ngoại liên kết với Học phần
   title              String
-  passingScore       Float          @default(70.0) // Quy tắc BR-01: Đạt >= 70%
+  description        String?
+  quizType           QuizType       @default(MODULE_QUIZ) // MODULE_QUIZ hoặc FINAL_EXAM
+  passingScore       Float          @default(70.0)        // BR-01: Điểm đạt >= 70%
   timeLimitMinutes   Int            @default(30)
   maxAttempts        Int            @default(3)
   questions          Question[]
   attempts           QuizAttempt[]
   createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 }
 
-// Bảng 2: Ngân hàng câu hỏi
+enum QuizType {
+  MODULE_QUIZ
+  FINAL_EXAM
+}
+
+// 2. Ngân hàng câu hỏi (Question)
 model Question {
-  id                 String   @id @default(uuid())
+  id                 String       @id @default(uuid())
   quizId             String
-  quiz               Quiz     @relation(fields: [quizId], references: [id])
+  quiz               Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
   questionText       String
-  questionType       String   @default("MCQ") // Trắc nghiệm nhiều lựa chọn
-  options            Json     // Lưu danh sách lựa chọn A, B, C, D dưới dạng JSONB
-  correctAnswer      String
-  relatedLessonId    String?  // Khóa ngoại liên kết với Bài học để hệ thống tự động gợi ý ôn tập (Quy tắc BR-03)
+  questionType       QuestionType @default(MCQ)
+  options            Json         // Dạng JSONB: [{ "key": "A", "text": "..." }, ...]
+  correctAnswer      String       // Ví dụ: "B"
+  explanation        String?      // Giải thích đáp án đúng
+  relatedLessonId    String?      // ID bài học tương ứng dùng để gợi ý ôn tập (BR-03)
+  relatedLessonTopic String?      // Tên chủ đề kiến thức (ví dụ: "Spring Bean Lifecycle")
 }
 
-// Bảng 3: Lịch sử làm bài thi
+enum QuestionType {
+  MCQ           // Trắc nghiệm nhiều lựa chọn
+  SINGLE_CHOICE // Chọn 1 đáp án đúng
+}
+
+// 3. Lịch sử làm bài thi (QuizAttempt)
 model QuizAttempt {
-  id                 String   @id @default(uuid())
+  id                 String        @id @default(uuid())
   quizId             String
-  quiz               Quiz     @relation(fields: [quizId], references: [id])
-  userId             String   // Khóa ngoại liên kết với User (Học viên)
-  scorePercentage    Float
-  isPassed           Boolean  @default(false) // True nếu điểm >= 70% (BR-01)
-  attemptNumber      Int      @default(1)     // Đếm số lần thi lại (BR-03)
-  userAnswers        Json     // Lưu chi tiết các câu học viên đã chọn để phân tích câu sai
-  createdAt          DateTime @default(now())
+  quiz               Quiz          @relation(fields: [quizId], references: [id])
+  userId             String        // ID Học viên
+  scorePercentage    Float         // Tỷ lệ % điểm đạt được
+  isPassed           Boolean       @default(false) // True nếu scorePercentage >= passingScore
+  attemptNumber      Int           @default(1)     // Lượt thi thứ mấy (BR-03)
+  status             AttemptStatus @default(COMPLETED)
+  userAnswers        Json          // Dạng JSONB: [{ "questionId": "...", "selectedOption": "A" }]
+  startedAt          DateTime      @default(now())
+  completedAt        DateTime?
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  TIMED_OUT
 }
