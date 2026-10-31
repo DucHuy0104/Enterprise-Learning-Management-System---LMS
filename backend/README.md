@@ -1,6 +1,6 @@
-# Corporate LMS - Backend (NestJS)
+# Corporate LMS - Backend (NestJS & Prisma ORM)
 
-Dịch vụ Backend cho nền tảng quản lý đào tạo nội bộ Corporate LMS (NovaTech Solutions), phát triển bằng **NestJS** và **TypeScript**.
+Dịch vụ Backend cho nền tảng quản lý đào tạo nội bộ Corporate LMS (NovaTech Solutions), phát triển bằng **NestJS (Modular Monolith)**, **TypeScript**, **PostgreSQL** và **Prisma ORM**.
 
 ---
 
@@ -35,7 +35,7 @@ npm install
 ---
 
 ### Bước 3: Tạo file môi trường (`.env`)
-Tạo một file có tên là **`.env`** ngay trong thư mục `backend/` và dán nội dung sau:
+Tạo file **`.env`** ngay trong thư mục `backend/` (hoặc sao chép từ file mẫu `.env.example`):
 
 ```env
 # Kết nối PostgreSQL Docker Local
@@ -44,37 +44,53 @@ DATABASE_URL="postgresql://lms_user:lms_password@localhost:5432/corporate_lms?sc
 # Kết nối Redis Local
 REDIS_URL="redis://localhost:6379"
 
-# Cổng khởi chạy Backend
+# Cổng khởi chạy Backend API
 PORT=5000
 ```
-*(Bạn cũng có thể đổi tên file `.env.example` trong thư mục backend thành `.env` ).*
 
 ---
 
-### Bước 4: Khởi chạy Server Backend
+### Bước 4: Đồng bộ CSDL & Sinh Prisma Client
 
-Chạy lệnh sau để khởi động server ở chế độ phát triển (tự động reload khi sửa code):
+```bash
+npx prisma migrate dev
+npx prisma generate
+```
+
+---
+
+### Bước 5: Khởi chạy Server Backend
 
 ```bash
 npm run start:dev
 ```
 
-Sau khi chạy xong, mở trình duyệt truy cập:
-`http://localhost:3000`
-
-Nếu thấy hiển thị dòng chữ:
-```text
-Hello World!
-```
-là bạn đã cài đặt và chạy thành công!
+Server sẽ khởi chạy tại: **`http://localhost:5000/api`**  
+Giao diện Swagger API Docs: **`http://localhost:5000/api/docs`**
 
 ---
 
-## 3. Kiểm Tra Build Trước Khi Tạo Pull Request
+## 3. Tài Liệu Swagger UI & Danh Sách API
 
-Trước khi push code lên GitHub, hãy chạy lệnh build để đảm bảo không có lỗi:
+Truy cập trực tiếp trên trình duyệt: 👉 **`http://localhost:5000/api/docs`** để xem mô tả các Schema và bấm **"Try it out"** test API trực quan.
+
+| Method | Endpoint | Mô tả |
+| :--- | :--- | :--- |
+| `GET` | `/api/docs` | **Swagger UI**: Giao diện tài liệu và test API trực quan |
+| `GET` | `/api/health` | **Healthcheck**: Kiểm tra trạng thái server, kết nối CSDL và CORS |
+| `GET` | `/api/users` | Lấy danh sách tất cả người dùng (sắp xếp mới nhất) |
+| `POST` | `/api/users` | Tạo người dùng mới (`email`, `fullName`, `role` tùy chọn) |
+| `GET` | `/api/users/:id` | Xem chi tiết thông tin một người dùng theo UUID |
+| `PATCH` | `/api/users/:id` | Cập nhật thông tin người dùng (`fullName`, `role`,...) |
+| `DELETE` | `/api/users/:id` | Xóa người dùng theo UUID |
+
+---
+
+## 4. Kiểm Tra Build Trước Khi Tạo Pull Request
+
+Trước khi push code lên GitHub, hãy chạy lệnh build để đảm bảo đạt chuẩn CI:
 
 ```bash
 npm run build
 ```
-*(Lệnh này kết thúc êm đẹp và tạo ra thư mục `dist/` là đạt chuẩn CI).*
+*(Lệnh này kết thúc êm đẹp với exit code 0 và tạo ra thư mục `dist/` là đạt chuẩn CI).*
